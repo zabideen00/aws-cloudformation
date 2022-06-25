@@ -2,6 +2,12 @@ AWSTemplateFormatVersion: 2010-09-09
 Description: Creating VPC
 
 Parameters:
+
+  Environment:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: /cloudformation/vpc/environment
+    Description: Select environment from parameter store
+
   VpcCidr:
     Type: String
     Default: 192.168.0.0/16
@@ -17,11 +23,11 @@ Resources:
       InstanceTenancy: default
       Tags:
         - Key: Name
-          Value: CustomVpc
+          Value: !Sub '${Environment}-vpc'
 
 Outputs:
   CustomVpc:
     Description: ID of custom VPC
     Value: !Ref CustomVpc
     Export:
-      Name: CustomVpc
+      Name: !Sub '${Environment}-Vpc'
