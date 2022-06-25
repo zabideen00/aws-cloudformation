@@ -1,0 +1,90 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Creating route tables
+
+Parameters:
+
+  Environment:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: /cloudformation/vpc/environment
+    Description: Select environment from parameter store
+
+Resources:
+  PublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !ImportValue 
+          'Fn::Sub': '${Environment}-vpc'
+      Tags:
+        - Key: Name
+          Value: !Sub '${Environment}-public-rt'
+
+  PrivateRouteTableA:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !ImportValue 
+          'Fn::Sub': '${Environment}-vpc'
+      Tags:
+        - Key: Name
+          Value: !Sub '${Environment}-private-rt-a'
+
+  PrivateRouteTableB:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !ImportValue 
+          'Fn::Sub': '${Environment}-vpc'
+      Tags:
+        - Key: Name
+          Value: !Sub '${Environment}-private-rt-b'
+
+
+
+  PublicASubnetRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    DependsOn: PublicRouteTable
+    Properties:
+      SubnetId: !ImportValue 
+        'Fn::Sub': '${Environment}-public-a'
+      RouteTableId: !Ref PublicRouteTable
+
+  PublicBSubnetRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    DependsOn: PublicRouteTable
+    Properties:
+      SubnetId: !ImportValue
+        'Fn::Sub': '${Environment}-public-b'
+      RouteTableId: !Ref PublicRouteTable
+
+  PrivateASubnetRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    DependsOn: PrivateRouteTableA
+    Properties:
+      SubnetId: !ImportValue
+        'Fn::Sub': '${Environment}-private-a'
+      RouteTableId: !Ref PrivateRouteTableA
+
+  PrivateBSubnetRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    DependsOn: PrivateRouteTableB
+    Properties:
+      SubnetId: !ImportValue
+        'Fn::Sub': '${Environment}-private-b'
+      RouteTableId: !Ref PrivateRouteTableB
+
+Outputs:
+  PublicRouteTable:
+    Description: route table for public subnets
+    Value: !Ref PublicRouteTable
+    Export:
+      Name: !Sub '${Environment}-public-rt'
+
+  PrivateRouteTableA:
+    Description: route table for private subnet a
+    Value: !Ref PrivateRouteTableA
+    Export:
+      Name: !Sub '${Environment}-private-a-rt'
+
+  PrivateRouteTableB:
+    Description: route table for private subnet b
+    Value: !Ref PrivateRouteTableB
+    Export:
+      Name: !Sub '${Environment}-private-b-rt'
