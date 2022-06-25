@@ -1,0 +1,117 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Creating subnets for VPC
+
+Parameters:
+
+  Environment:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: /cloudformation/vpc/environment
+    Description: Select environment from parameter store
+
+  PublicSubnetCidrA:
+    Type: String
+    Default: 192.168.0.0/20
+    Description: Enter a valid CIDR block for subnet
+
+  PublicSubnetCidrB:
+    Type: String
+    Default: 192.168.16.0/20
+    Description: Enter a valid CIDR block for subnet
+
+  PrivateSubnetCidrA:
+    Type: String
+    Default: 192.168.32.0/20
+    Description: Enter a valid CIDR block for subnet
+
+  PrivateSubnetCidrB:
+    Type: String
+    Default: 192.168.48.0/20
+    Description: Enter a valid CIDR block for subnet
+
+Resources:
+  PrivateSubnetA:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: !Select
+        - 0
+        - !GetAZs
+          Ref: 'AWS::Region'
+      CidrBlock: !Ref PrivateSubnetCidrA
+      MapPublicIpOnLaunch: false
+      VpcId: !ImportValue 
+          'Fn::Sub': '${Environment}-vpc'
+      Tags:
+        - Key: Name
+          Value: !Join ["-", [!Ref Environment, "private-a"]]
+
+  PrivateSubnetB:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: !Select
+        - 1
+        - !GetAZs
+          Ref: 'AWS::Region'
+      CidrBlock: !Ref PrivateSubnetCidrB
+      MapPublicIpOnLaunch: false
+      VpcId: !ImportValue
+        'Fn::Sub': '${Environment}-vpc'
+      Tags:
+        - Key: Name
+          Value: !Join ["-", [!Ref Environment, "private-b"]]
+
+  PublicSubnetA:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: !Select
+        - 0
+        - !GetAZs
+          Ref: 'AWS::Region'
+      CidrBlock: !Ref PublicSubnetCidrA
+      MapPublicIpOnLaunch: true
+      VpcId: !ImportValue
+        'Fn::Sub': '${Environment}-vpc'
+      Tags:
+        - Key: Name
+          Value: !Join ["-", [!Ref Environment, "public-a"]]
+
+  PublicSubnetB:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: !Select
+        - 1
+        - !GetAZs
+          Ref: 'AWS::Region'
+      CidrBlock: !Ref PublicSubnetCidrB
+      MapPublicIpOnLaunch: true
+      VpcId: !ImportValue
+        'Fn::Sub': '${Environment}-vpc'
+      Tags:
+        - Key: Name
+          Value: !Join ["-", [!Ref Environment, "public-b"]]
+
+
+
+Outputs:
+  PrivateSubnetA:
+    Description: private subnet in AZ a
+    Value: !Ref PrivateSubnetA
+    Export:
+      Name: !Sub '${Environment}-private-a'
+
+  PrivateSubnetB:
+    Description: private subnet in AZ b
+    Value: !Ref PrivateSubnetB
+    Export:
+      Name: !Sub '${Environment}-private-b'
+
+  PublicSubnetA:
+    Description: public subnet in AZ a
+    Value: !Ref PublicSubnetA
+    Export:
+      Name: !Sub '${Environment}-public-a'
+
+  PublicSubnetB:
+    Description: public subnet in AZ b
+    Value: !Ref PublicSubnetB
+    Export:
+      Name: !Sub '${Environment}-public-b'

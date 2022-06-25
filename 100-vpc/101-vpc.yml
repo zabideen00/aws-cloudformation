@@ -30,4 +30,4 @@ Outputs:
     Description: ID of custom VPC
     Value: !Ref CustomVpc
     Export:
-      Name: !Sub '${Environment}-Vpc'
+      Name: !Sub '${Environment}-vpc'
