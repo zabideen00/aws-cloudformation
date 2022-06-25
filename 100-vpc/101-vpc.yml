@@ -1,0 +1,27 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Creating VPC
+
+Parameters:
+  VpcCidr:
+    Type: String
+    Default: 192.168.0.0/16
+    Description: Enter a valid VPC CIDR block
+
+Resources:
+  CustomVpc:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: !Ref VpcCidr
+      EnableDnsHostnames: true
+      EnableDnsSupport: true
+      InstanceTenancy: default
+      Tags:
+        - Key: Name
+          Value: CustomVpc
+
+Outputs:
+  CustomVpc:
+    Description: ID of custom VPC
+    Value: !Ref CustomVpc
+    Export:
+      Name: CustomVpc
