@@ -1,0 +1,38 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Adding routes to route table
+
+Parameters:
+
+  Environment:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: /cloudformation/vpc/environment
+    Description: Select environment from parameter store
+
+Resources:
+
+  PublicRouteTableRoutes:
+    Type: AWS::EC2::Route
+    Properties:
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !ImportValue
+        'Fn::Sub': '${Environment}-igw'
+      RouteTableId: !ImportValue
+        'Fn::Sub': '${Environment}-public-rt'
+
+  PrivateRouteTableRoutesA:
+    Type: AWS::EC2::Route
+    Properties:
+      DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId: !ImportValue
+        'Fn::Sub': '${Environment}-ngw-a'
+      RouteTableId: !ImportValue
+        'Fn::Sub': '${Environment}-private-a-rt'
+
+  PrivateRouteTableRoutesB:
+    Type: AWS::EC2::Route
+    Properties:
+      DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId: !ImportValue
+        'Fn::Sub': '${Environment}-ngw-b'
+      RouteTableId: !ImportValue
+        'Fn::Sub': '${Environment}-private-b-rt'
