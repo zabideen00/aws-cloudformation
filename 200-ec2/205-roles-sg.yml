@@ -1,0 +1,79 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Creating security groups and iam roles
+
+Parameters:
+
+  Environment:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: /cloudformation/vpc/environment
+    Description: Select environment from parameter store
+
+  PolicyArn:
+    Type: String
+    Default: arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
+    Description: Enter IAM policy ARN here
+
+  RoleDescription:
+    Type: String
+    Default: IAM role for quick SSM instance setup
+    Description: Enter IAM role description
+
+  SgDescription:
+    Type: String
+    Default: Security group for Asg
+    Description: Security group description
+
+Resources:
+  AsgIamRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument: Json
+      Description: !Ref RoleDescription
+      ManagedPolicyArns:
+        - !Ref PolicyArn
+      RoleName: !Sub '${Environment}-QuickInstanceSetRole'
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+            - ec2.amazonaws.com
+          Action:
+          - sts:AssumeRole
+  AsgSg:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: !Ref SgDescription
+      GroupName: !Sub '${Environment}-asg-sg'
+      SecurityGroupEgress:
+        - CidrIp: "0.0.0.0/0"
+          Description: "Allow all outbount traffic"
+          FromPort: -1
+          ToPort: -1
+          IpProtocol: -1
+      SecurityGroupIngress:
+        - CidrIp: "0.0.0.0/0"
+          Description: "Allow SSH port"
+          FromPort: 22
+          ToPort: 22
+          IpProtocol: tcp
+        - CidrIp: "0.0.0.0/0"
+          Description: "Allow HTTP port"
+          FromPort: 80
+          ToPort: 80
+          IpProtocol: tcp
+      VpcId: !ImportValue
+        'Fn::Sub': '${Environment}-vpc'
+
+Outputs:
+  AsgIamRole:
+    Description: IAM role ARN
+    Value: !Ref AsgIamRole
+    Export:
+      Name: !Sub '${Environment}-asg-iam-role'
+  AsgSgId:
+    Description: ASG security gropu
+    Value: !GetAtt AsgSg.GroupId
+    Export:
+      Name: !Sub '${Environment}-asg-sg'
