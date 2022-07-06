@@ -46,11 +46,14 @@ Resources:
       DesiredCapacity: !Ref DesiredAsg
       DesiredCapacityType: units
       HealthCheckGracePeriod: 10
-      HealthCheckType: EC2
+      HealthCheckType: ELB
       MaxSize: !Ref MaxAsg
       MinSize: !Ref MinAsg
       VPCZoneIdentifier:
         - !ImportValue
-          'Fn::Sub': '${Environment}-public-a'
+          'Fn::Sub': '${Environment}-private-a'
         - !ImportValue
-          'Fn::Sub': '${Environment}-public-b'
+          'Fn::Sub': '${Environment}-private-b'
+      TargetGroupARNs:
+        - !ImportValue
+          'Fn::Sub': '${Environment}-tg'

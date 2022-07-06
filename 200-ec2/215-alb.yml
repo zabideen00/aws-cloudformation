@@ -1,0 +1,52 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Creating alb
+
+Parameters:
+
+  Environment:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: /cloudformation/vpc/environment
+    Description: Select environment from parameter store
+
+Resources:
+  Alb:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      IpAddressType: ipv4
+      LoadBalancerAttributes:
+        - Key: deletion_protection.enabled
+          Value: false
+        - Key: idle_timeout.timeout_seconds
+          Value: 60
+        - Key: routing.http2.enabled
+          Value: true
+      Name: !Sub '${Environment}-alb'
+      Scheme: internet-facing
+      SecurityGroups:
+        - !ImportValue
+          'Fn::Sub': '${Environment}-alb-sg'
+      Subnets:
+        - !ImportValue
+          'Fn::Sub': '${Environment}-public-a'
+        - !ImportValue
+          'Fn::Sub': '${Environment}-public-b'
+      Type: application
+
+  DefaultAlbListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    DependsOn: Alb
+    Properties:
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !ImportValue
+            'Fn::Sub': '${Environment}-tg'
+      LoadBalancerArn: !Ref Alb
+      Port: 80
+      Protocol: HTTP
+
+Outputs:
+  Alb:
+    Description: alb id
+    Value: !Ref Alb
+    Export:
+      Name: !Sub '${Environment}-alb'

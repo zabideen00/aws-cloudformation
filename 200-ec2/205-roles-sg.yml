@@ -20,7 +20,7 @@ Parameters:
 
   SgDescription:
     Type: String
-    Default: Security group for Asg
+    Default: Security group
     Description: Security group description
 
 Resources:
@@ -43,6 +43,7 @@ Resources:
           - sts:AssumeRole
   AsgSg:
     Type: AWS::EC2::SecurityGroup
+    DependsOn: AlbSg
     Properties:
       GroupDescription: !Ref SgDescription
       GroupName: !Sub '${Environment}-asg-sg'
@@ -58,6 +59,25 @@ Resources:
           FromPort: 22
           ToPort: 22
           IpProtocol: tcp
+        - SourceSecurityGroupId: !GetAtt AlbSg.GroupId
+          Description: "Allow HTTP port"
+          FromPort: 80
+          ToPort: 80
+          IpProtocol: tcp
+      VpcId: !ImportValue
+        'Fn::Sub': '${Environment}-vpc'
+  AlbSg:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: !Ref SgDescription
+      GroupName: !Sub '${Environment}-alb-sg'
+      SecurityGroupEgress:
+        - CidrIp: "0.0.0.0/0"
+          Description: "Allow all outbount traffic"
+          FromPort: -1
+          ToPort: -1
+          IpProtocol: -1
+      SecurityGroupIngress:
         - CidrIp: "0.0.0.0/0"
           Description: "Allow HTTP port"
           FromPort: 80
@@ -79,7 +99,12 @@ Outputs:
     Export:
       Name: !Sub '${Environment}-asg-instance-profile'
   AsgSgId:
-    Description: ASG security gropu
+    Description: ASG security group
     Value: !GetAtt AsgSg.GroupId
     Export:
       Name: !Sub '${Environment}-asg-sg'
+  AlbSgId:
+    Description: ALB security group
+    Value: !GetAtt AlbSg.GroupId
+    Export:
+      Name: !Sub '${Environment}-alb-sg'
