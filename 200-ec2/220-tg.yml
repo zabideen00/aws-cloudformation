@@ -1,0 +1,29 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Creating target group
+
+Parameters:
+
+  Environment:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: /cloudformation/vpc/environment
+    Description: Select environment from parameter store
+
+Resources:
+  TargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      HealthCheckEnabled: true
+      HealthCheckPath: /health.html
+      Name: !Sub '${Environment}-tg'
+      Port: 80
+      Protocol: HTTP
+      TargetType: instance
+      VpcId: !ImportValue
+        'Fn::Sub': '${Environment}-vpc'
+
+Outputs:
+  TargetGroup:
+    Description: Target group arn
+    Value: !Ref TargetGroup
+    Export:
+      Name: !Sub '${Environment}-tg'
