@@ -43,7 +43,7 @@ Resources:
         InstanceType: !FindInMap [EnvironmentMap, !Ref Environment, instancetype]
         IamInstanceProfile:
           Name: !ImportValue
-            'Fn::Sub': '${Environment}-asg-iam-role'
+            'Fn::Sub': '${Environment}-asg-instance-profile'
         KeyName: !Ref SshKey
         SecurityGroupIds:
           - !ImportValue

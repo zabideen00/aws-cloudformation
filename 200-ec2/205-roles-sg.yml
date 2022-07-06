@@ -65,13 +65,19 @@ Resources:
           IpProtocol: tcp
       VpcId: !ImportValue
         'Fn::Sub': '${Environment}-vpc'
+  InstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      InstanceProfileName: !Sub '${Environment}-instance-profile'
+      Roles:
+        - !Ref AsgIamRole
 
 Outputs:
-  AsgIamRole:
-    Description: IAM role ARN
-    Value: !Ref AsgIamRole
+  AsgInstanceProfile:
+    Description: Instance profile for asg
+    Value: !Ref InstanceProfile
     Export:
-      Name: !Sub '${Environment}-asg-iam-role'
+      Name: !Sub '${Environment}-asg-instance-profile'
   AsgSgId:
     Description: ASG security gropu
     Value: !GetAtt AsgSg.GroupId

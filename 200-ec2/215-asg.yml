@@ -1,0 +1,56 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Creating auto scaling group from launch template
+
+Parameters:
+
+  Environment:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: /cloudformation/vpc/environment
+    Description: Select environment from parameter store
+
+  DesiredAsg:
+    Type: String
+    Default: 1
+    Description: Desired number of instances
+
+  MinAsg:
+    Type: String
+    Default: 1
+    Description: Minimum number of instances
+
+  MaxAsg:
+    Type: String
+    Default: 3
+    Description: Maximum number of instances
+
+Resources:
+
+  Asg:
+    Type: AWS::AutoScaling::AutoScalingGroup
+    Properties:
+      LaunchTemplate:
+        LaunchTemplateId: !ImportValue
+          'Fn::Sub': '${Environment}-lt-id'
+        Version: !ImportValue
+          'Fn::Sub': '${Environment}-lt-latest-version'
+      AutoScalingGroupName: !Sub '${Environment}-asg'
+      AvailabilityZones:
+        - !Select
+          - 0
+          - !GetAZs
+            Ref: 'AWS::Region'
+        - !Select
+          - 1
+          - !GetAZs
+            Ref: 'AWS::Region'
+      DesiredCapacity: !Ref DesiredAsg
+      DesiredCapacityType: units
+      HealthCheckGracePeriod: 10
+      HealthCheckType: EC2
+      MaxSize: !Ref MaxAsg
+      MinSize: !Ref MinAsg
+      VPCZoneIdentifier:
+        - !ImportValue
+          'Fn::Sub': '${Environment}-public-a'
+        - !ImportValue
+          'Fn::Sub': '${Environment}-public-b'
