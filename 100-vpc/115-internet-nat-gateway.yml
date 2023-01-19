@@ -24,43 +24,43 @@ Resources:
       VpcId: !ImportValue
         'Fn::Sub': '${Environment}-vpc'
 
-  EIPForNatGatewayA:
-    Type: AWS::EC2::EIP
-    Properties:
-      Domain: vpc
-      Tags:
-        - Key: Name
-          Value: !Sub '${Environment}-eip-a'
+  # EIPForNatGatewayA:
+  #   Type: AWS::EC2::EIP
+  #   Properties:
+  #     Domain: vpc
+  #     Tags:
+  #       - Key: Name
+  #         Value: !Sub '${Environment}-eip-a'
 
-  EIPForNatGatewayB:
-    Type: AWS::EC2::EIP
-    Properties:
-      Domain: vpc
-      Tags:
-        - Key: Name
-          Value: !Sub '${Environment}-eip-b'
+  # EIPForNatGatewayB:
+  #   Type: AWS::EC2::EIP
+  #   Properties:
+  #     Domain: vpc
+  #     Tags:
+  #       - Key: Name
+  #         Value: !Sub '${Environment}-eip-b'
 
-  NatGatewayA:
-    Type: AWS::EC2::NatGateway
-    DependsOn: EIPForNatGatewayA
-    Properties:
-      AllocationId: !GetAtt EIPForNatGatewayA.AllocationId
-      SubnetId: !ImportValue
-        'Fn::Sub': '${Environment}-public-a'
-      Tags:
-        - Key: Name
-          Value: !Sub '${Environment}-igw-a'
+  # NatGatewayA:
+  #   Type: AWS::EC2::NatGateway
+  #   DependsOn: EIPForNatGatewayA
+  #   Properties:
+  #     AllocationId: !GetAtt EIPForNatGatewayA.AllocationId
+  #     SubnetId: !ImportValue
+  #       'Fn::Sub': '${Environment}-public-a'
+  #     Tags:
+  #       - Key: Name
+  #         Value: !Sub '${Environment}-igw-a'
 
-  NatGatewayB:
-    Type: AWS::EC2::NatGateway
-    DependsOn: EIPForNatGatewayB
-    Properties:
-      AllocationId: !GetAtt EIPForNatGatewayB.AllocationId
-      SubnetId: !ImportValue
-        'Fn::Sub': '${Environment}-public-b'
-      Tags:
-        - Key: Name
-          Value: !Sub '${Environment}-igw-b'
+  # NatGatewayB:
+  #   Type: AWS::EC2::NatGateway
+  #   DependsOn: EIPForNatGatewayB
+  #   Properties:
+  #     AllocationId: !GetAtt EIPForNatGatewayB.AllocationId
+  #     SubnetId: !ImportValue
+  #       'Fn::Sub': '${Environment}-public-b'
+  #     Tags:
+  #       - Key: Name
+  #         Value: !Sub '${Environment}-igw-b'
 
 Outputs:
 
@@ -70,14 +70,14 @@ Outputs:
     Export:
       Name: !Sub '${Environment}-igw'
 
-  NatGatewayA:
-    Description: nat gateway in AZ a
-    Value: !Ref NatGatewayA
-    Export:
-      Name: !Sub '${Environment}-ngw-a'
+  # NatGatewayA:
+  #   Description: nat gateway in AZ a
+  #   Value: !Ref NatGatewayA
+  #   Export:
+  #     Name: !Sub '${Environment}-ngw-a'
 
-  NatGatewayB:
-    Description: nat gateway in AZ b
-    Value: !Ref NatGatewayB
-    Export:
-      Name: !Sub '${Environment}-ngw-b'
+  # NatGatewayB:
+  #   Description: nat gateway in AZ b
+  #   Value: !Ref NatGatewayB
+  #   Export:
+  #     Name: !Sub '${Environment}-ngw-b'

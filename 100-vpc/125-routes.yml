@@ -19,20 +19,20 @@ Resources:
       RouteTableId: !ImportValue
         'Fn::Sub': '${Environment}-public-rt'
 
-  PrivateRouteTableRoutesA:
-    Type: AWS::EC2::Route
-    Properties:
-      DestinationCidrBlock: 0.0.0.0/0
-      NatGatewayId: !ImportValue
-        'Fn::Sub': '${Environment}-ngw-a'
-      RouteTableId: !ImportValue
-        'Fn::Sub': '${Environment}-private-a-rt'
+  # PrivateRouteTableRoutesA:
+  #   Type: AWS::EC2::Route
+  #   Properties:
+  #     DestinationCidrBlock: 0.0.0.0/0
+  #     NatGatewayId: !ImportValue
+  #       'Fn::Sub': '${Environment}-ngw-a'
+  #     RouteTableId: !ImportValue
+  #       'Fn::Sub': '${Environment}-private-a-rt'
 
-  PrivateRouteTableRoutesB:
-    Type: AWS::EC2::Route
-    Properties:
-      DestinationCidrBlock: 0.0.0.0/0
-      NatGatewayId: !ImportValue
-        'Fn::Sub': '${Environment}-ngw-b'
-      RouteTableId: !ImportValue
-        'Fn::Sub': '${Environment}-private-b-rt'
+  # PrivateRouteTableRoutesB:
+  #   Type: AWS::EC2::Route
+  #   Properties:
+  #     DestinationCidrBlock: 0.0.0.0/0
+  #     NatGatewayId: !ImportValue
+  #       'Fn::Sub': '${Environment}-ngw-b'
+  #     RouteTableId: !ImportValue
+  #       'Fn::Sub': '${Environment}-private-b-rt'
